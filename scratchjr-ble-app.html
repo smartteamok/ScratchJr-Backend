@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>ScratchJr BLE - Tablet</title>
+  <style>
+    :root {
+      --bg: #1a1d23;
+      --card: #252932;
+      --accent: #4a9eff;
+      --accent-dim: #3a7ed9;
+      --success: #34c759;
+      --success-dim: #2da64a;
+      --danger: #ff453a;
+      --text: #f5f5f7;
+      --text-dim: #9898a0;
+      --radius: 16px;
+      --touch-min: 56px;
+      --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: var(--font-sans);
+      font-size: 17px;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .app {
+      min-height: 100%;
+      padding: 20px;
+      padding-bottom: env(safe-area-inset-bottom, 20px);
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 600;
+      margin: 0 0 20px 0;
+      text-align: center;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-dim);
+      margin: 0 0 16px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Buttons - large touch targets */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: var(--touch-min);
+      min-width: var(--touch-min);
+      padding: 16px 24px;
+      font-size: 17px;
+      font-weight: 600;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      touch-action: manipulation;
+      transition: transform 0.1s, opacity 0.2s;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+      opacity: 0.9;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--accent);
+      border: 2px solid var(--accent);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-row .btn {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    /* Device list */
+    .device-list {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    .device-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+
+    .device-item .name {
+      font-weight: 500;
+    }
+
+    .device-item .type {
+      font-size: 12px;
+      color: var(--text-dim);
+    }
+
+    .device-item .disconnect {
+      padding: 8px 16px;
+      font-size: 14px;
+      background: var(--danger);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    /* Toggle buttons (programación) */
+    .toggle-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .hex-display {
+      font-family: 'SF Mono', 'Monaco', monospace;
+      font-size: 18px;
+      padding: 12px 16px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 10px;
+      min-width: 120px;
+      text-align: center;
+    }
+
+    .toggle-btn {
+      min-width: 56px;
+      min-height: 56px;
+      padding: 0;
+      font-size: 22px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.1);
+      color: var(--text);
+      border: 2px solid transparent;
+    }
+
+    .toggle-btn.on {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+
+    .toggle-btn.on::after {
+      content: ' ✓';
+    }
+
+    .send-btn {
+      margin-left: auto;
+    }
+
+    /* Status log */
+    .status-box {
+      font-family: 'SF Mono', 'Monaco', monospace;
+      font-size: 13px;
+      background: #0d0e12;
+      border-radius: 12px;
+      padding: 16px;
+      max-height: 200px;
+      overflow-y: auto;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    .status-box:empty::before {
+      content: 'Sin mensajes';
+      opacity: 0.6;
+    }
+
+    /* Spacing */
+    .mb-8 { margin-bottom: 8px; }
+    .mb-16 { margin-bottom: 16px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>ScratchJr BLE</h1>
+
+    <!-- Conexión -->
+    <div class="card mb-16">
+      <div class="card-title">Conexión</div>
+      <div class="btn-row">
+        <button id="btn-connect" class="btn btn-primary">🔗 Conectar dispositivo</button>
+      </div>
+      <ul id="device-list" class="device-list" style="margin-top:12px;"></ul>
+    </div>
+
+    <!-- START -->
+    <div class="card mb-16">
+      <button id="btn-start" class="btn btn-success" style="width:100%; font-size:20px;">▶ START</button>
+    </div>
+
+    <!-- Programación 1 (micro:bit) -->
+    <div class="card mb-16">
+      <div class="card-title">Programación 1 (micro:bit)</div>
+      <div class="toggle-row">
+        <span id="hex-1" class="hex-display">-</span>
+        <button class="toggle-btn" data-panel="1" data-idx="0" data-byte="1">♥</button>
+        <button class="toggle-btn" data-panel="1" data-idx="1" data-byte="2">□</button>
+        <button class="toggle-btn" data-panel="1" data-idx="2" data-byte="3">△</button>
+        <button class="toggle-btn" data-panel="1" data-idx="3" data-byte="4">✓</button>
+        <button class="toggle-btn" data-panel="1" data-idx="4" data-byte="5">✗</button>
+        <button id="send-1" class="btn btn-primary send-btn">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Programación 2 (Arduino) -->
+    <div class="card mb-16">
+      <div class="card-title">Programación 2 (Arduino)</div>
+      <div class="toggle-row">
+        <span id="hex-2" class="hex-display">-</span>
+        <button class="toggle-btn" data-panel="2" data-idx="0" data-byte="1">R</button>
+        <button class="toggle-btn" data-panel="2" data-idx="1" data-byte="2">B</button>
+        <button class="toggle-btn" data-panel="2" data-idx="2" data-byte="3">Y</button>
+        <button class="toggle-btn" data-panel="2" data-idx="3" data-byte="4">W</button>
+        <button class="toggle-btn" data-panel="2" data-idx="4" data-byte="5">P</button>
+        <button id="send-2" class="btn btn-primary send-btn">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="card">
+      <div class="card-title">Status</div>
+      <div id="status" class="status-box"></div>
+    </div>
+  </div>
+
+  <script>
+    // --- UUIDs ---
+    const OPCODE_START = 0xF0;
+    const UUID_ARDUINO = '0000ffe1-0000-1000-8000-00805f9b34fb';
+    const UUID_MB_LEER = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+    const UUID_MB_ESCRIBIR = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
+    const UUID_NORDIC_SVC = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+    const UUID_ARDUINO_SVC = '0000ffe0-0000-1000-8000-00805f9b34fb';
+
+    // --- Estado ---
+    const connected = new Map(); // id -> { device, server, writeChar, readChar, type, name }
+
+    // --- DOM ---
+    const status = document.getElementById('status');
+    const deviceList = document.getElementById('device-list');
+    const btnConnect = document.getElementById('btn-connect');
+
+    function log(msg) {
+      const line = document.createElement('div');
+      line.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+      status.appendChild(line);
+      status.scrollTop = status.scrollHeight;
+    }
+
+    function hex2(str) {
+      return ('0' + str.toString(16)).slice(-2).toUpperCase();
+    }
+
+    // --- Escaneo: Web Bluetooth usa requestDevice (gesto de usuario)
+    async function connectDevicePicker() {
+      btnConnect.disabled = true;
+      log('🔍 Buscando dispositivos Bluetooth...');
+      try {
+        const device = await navigator.bluetooth.requestDevice({
+          acceptAllDevices: true,
+          optionalServices: [UUID_NORDIC_SVC, UUID_ARDUINO_SVC, 'generic_access']
+        });
+        await connectDevice(device);
+      } catch (e) {
+        if (e.name !== 'NotFoundError') log('❌ Error: ' + e.message);
+      }
+      btnConnect.disabled = false;
+    }
+
+    async function connectDevice(device) {
+      const id = device.id || device.address || Math.random().toString(36).slice(2);
+      if (connected.has(id)) {
+        log('⚠️ Ya conectado a este dispositivo.');
+        return;
+      }
+      log('⏳ Conectando a ' + (device.name || id) + '...');
+      try {
+        const server = await device.gatt.connect();
+        let type = null;
+        let writeUuid = null;
+        let readUuid = null;
+        let svcUuid = null;
+
+        try {
+          await server.getPrimaryService(UUID_NORDIC_SVC);
+          type = 'microbit';
+          writeUuid = UUID_MB_ESCRIBIR;
+          readUuid = UUID_MB_LEER;
+          svcUuid = UUID_NORDIC_SVC;
+        } catch (_) {}
+
+        if (!type) {
+          try {
+            await server.getPrimaryService(UUID_ARDUINO_SVC);
+            type = 'arduino';
+            writeUuid = UUID_ARDUINO;
+            readUuid = UUID_ARDUINO;
+            svcUuid = UUID_ARDUINO_SVC;
+          } catch (_) {}
+        }
+
+        if (!type) {
+          log('❌ Dispositivo no compatible. Desconectando...');
+          server.disconnect();
+          return;
+        }
+
+        const svc = await server.getPrimaryService(svcUuid);
+        const writeChar = await svc.getCharacteristic(writeUuid);
+        let readChar = null;
+        try {
+          readChar = await svc.getCharacteristic(readUuid);
+          await readChar.startNotifications();
+          readChar.addEventListener('characteristicvaluechanged', (e) => {
+            const v = e.target.value;
+            const s = String.fromCharCode.apply(null, new Uint8Array(v.buffer)).replace(/\0/g, '').trim();
+            if (s) log('📥 [RECIBIDO] ' + s);
+          });
+        } catch (_) {}
+
+        connected.set(id, { device, server, writeChar, type, name: device.name || id });
+        log('🚀 ¡CONECTADO a ' + (device.name || id) + ' (Modo ' + (type === 'microbit' ? 'micro:bit' : 'Arduino') + ')!');
+        renderDeviceList();
+
+        device.addEventListener('gattserverdisconnected', () => {
+          connected.delete(id);
+          log('⚠️ ' + (device.name || id) + ' se desconectó.');
+          renderDeviceList();
+        });
+      } catch (e) {
+        log('❌ Error al conectar: ' + e.message);
+      }
+    }
+
+    function renderDeviceList() {
+      deviceList.innerHTML = '';
+      connected.forEach((info, id) => {
+        const li = document.createElement('li');
+        li.className = 'device-item';
+        li.innerHTML = `
+          <div>
+            <span class="name">${info.name}</span>
+            <div class="type">${info.type === 'microbit' ? 'micro:bit' : 'Arduino'}</div>
+          </div>
+          <button class="disconnect" data-id="${id}">Desconectar</button>
+        `;
+        li.querySelector('.disconnect').onclick = () => {
+          info.server.disconnect();
+          connected.delete(id);
+          renderDeviceList();
+        };
+        deviceList.appendChild(li);
+      });
+    }
+
+    // --- Envíos ---
+    function getByType(type) {
+      return Array.from(connected.entries())
+        .filter(([, v]) => v.type === type)
+        .map(([id, v]) => [id, v]);
+    }
+
+    async function sendStart() {
+      const targets = Array.from(connected.values());
+      if (!targets.length) {
+        log('⚠️ No hay dispositivos conectados.');
+        return;
+      }
+      log('▶ Botón START (0xF0)');
+      for (const { writeChar, type, name } of targets) {
+        try {
+          const payload = type === 'microbit' ? new Uint8Array([OPCODE_START, 0x0a]) : new Uint8Array([OPCODE_START]);
+          await writeChar.writeValueWithoutResponse(payload);
+          log('📤 [ENVIADO a ' + name + '] -> START (0xF0)');
+        } catch (e) {
+          log('❌ Falló envío a ' + name + ': ' + e.message);
+        }
+      }
+    }
+
+    async function sendToMicrobit(data) {
+      const targets = getByType('microbit');
+      if (!targets.length) {
+        log('⚠️ No hay micro:bit conectado.');
+        return;
+      }
+      const payload = new Uint8Array([...data, 0x0a]);
+      for (const [, { writeChar, name }] of targets) {
+        try {
+          await writeChar.writeValueWithoutResponse(payload);
+          log('📤 [ENVIADO a ' + name + '] -> ' + Array.from(data).map(hex2).join(''));
+        } catch (e) {
+          log('❌ Falló envío a ' + name + ': ' + e.message);
+        }
+      }
+    }
+
+    async function sendToArduino(data) {
+      const targets = getByType('arduino');
+      if (!targets.length) {
+        log('⚠️ No hay Arduino conectado.');
+        return;
+      }
+      const payload = new Uint8Array(data);
+      for (const [, { writeChar, name }] of targets) {
+        try {
+          await writeChar.writeValueWithoutResponse(payload);
+          log('📤 [ENVIADO a ' + name + '] -> ' + Array.from(data).map(hex2).join(''));
+        } catch (e) {
+          log('❌ Falló envío a ' + name + ': ' + e.message);
+        }
+      }
+    }
+
+    // --- Toggles ---
+    const panelState = { 1: [false, false, false, false, false], 2: [false, false, false, false, false] };
+    const panelBytes = { 1: [0x01, 0x02, 0x03, 0x04, 0x05], 2: [0x01, 0x02, 0x03, 0x04, 0x05] };
+
+    document.querySelectorAll('.toggle-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const panel = +btn.dataset.panel;
+        const idx = +btn.dataset.idx;
+        panelState[panel][idx] = !panelState[panel][idx];
+        btn.classList.toggle('on', panelState[panel][idx]);
+        const hex = document.getElementById('hex-' + panel);
+        const bytes = panelState[panel].map((v, i) => v ? panelBytes[panel][i] : null).filter(Boolean);
+        hex.textContent = bytes.length ? bytes.map(b => hex2(b)).join('') : '-';
+      });
+    });
+
+    document.getElementById('send-1').addEventListener('click', () => {
+      const bytes = panelState[1].map((v, i) => v ? panelBytes[1][i] : null).filter(Boolean);
+      if (!bytes.length) { log('⚠️ No hay bytes seleccionados.'); return; }
+      sendToMicrobit(bytes);
+    });
+
+    document.getElementById('send-2').addEventListener('click', () => {
+      const bytes = panelState[2].map((v, i) => v ? panelBytes[2][i] : null).filter(Boolean);
+      if (!bytes.length) { log('⚠️ No hay bytes seleccionados.'); return; }
+      sendToArduino(bytes);
+    });
+
+    // --- Eventos ---
+    btnConnect.onclick = connectDevicePicker;
+    document.getElementById('btn-start').onclick = () => sendStart();
+
+    log('👋 Abre esta app en Bluefy y pulsa Conectar para empezar.');
+  </script>
+</body>
+</html>
