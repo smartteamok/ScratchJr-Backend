@@ -8,7 +8,7 @@ Este proyecto permite controlar un Arduino Nano (Educabot) y una BBC micro:bit V
 * **test_ble.py**: Aplicación para macOS/Windows con interfaz gráfica basada en la librería Bleak y Tkinter.
 * **index.html**: Versión web optimizada para dispositivos móviles (iOS/Android) utilizando Web Bluetooth API.
 
-## Instalacion de Firmwares
+## Instalación de Firmwares
 
 Los archivos necesarios se encuentran en la carpeta `/firmware`:
 
