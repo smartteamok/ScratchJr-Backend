@@ -198,9 +198,16 @@
       border-color: var(--accent);
     }
 
-    .toggle-btn.on::after {
-      content: ' ✓';
+    .toggle-btn.on { font-weight: 600; }
+
+    .led-indicator {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #666;
+      flex-shrink: 0;
     }
+    .led-indicator.on { background: #0f0; box-shadow: 0 0 8px #0f0; }
 
     .send-btn {
       margin-left: auto;
@@ -247,31 +254,67 @@
       <button id="btn-start" class="btn btn-success" style="width:100%; font-size:20px;">▶ START</button>
     </div>
 
-    <!-- Programación 1 (micro:bit) -->
+    <!-- Programación 1 (micro:bit 1) -->
     <div class="card mb-16">
-      <div class="card-title">Programación 1 (micro:bit)</div>
+      <div class="card-title">Programación 1 (micro:bit 1)</div>
       <div class="toggle-row">
+        <span id="led-0" class="led-indicator" title="Activo cuando la placa envía 0xAA"></span>
+        <span id="hex-0" class="hex-display">-</span>
+        <button class="toggle-btn" data-panel="0" data-idx="0">♥</button>
+        <button class="toggle-btn" data-panel="0" data-idx="1">□</button>
+        <button class="toggle-btn" data-panel="0" data-idx="2">△</button>
+        <button class="toggle-btn" data-panel="0" data-idx="3">✓</button>
+        <button class="toggle-btn" data-panel="0" data-idx="4">✗</button>
+        <button class="toggle-btn" data-panel="0" data-idx="5">Msg</button>
+        <button id="send-0" class="btn btn-primary send-btn">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Programación 2 (Arduino 1) -->
+    <div class="card mb-16">
+      <div class="card-title">Programación 2 (Arduino 1)</div>
+      <div class="toggle-row">
+        <span id="led-1" class="led-indicator"></span>
         <span id="hex-1" class="hex-display">-</span>
-        <button class="toggle-btn" data-panel="1" data-idx="0" data-byte="1">♥</button>
-        <button class="toggle-btn" data-panel="1" data-idx="1" data-byte="2">□</button>
-        <button class="toggle-btn" data-panel="1" data-idx="2" data-byte="3">△</button>
-        <button class="toggle-btn" data-panel="1" data-idx="3" data-byte="4">✓</button>
-        <button class="toggle-btn" data-panel="1" data-idx="4" data-byte="5">✗</button>
+        <button class="toggle-btn" data-panel="1" data-idx="0">R</button>
+        <button class="toggle-btn" data-panel="1" data-idx="1">B</button>
+        <button class="toggle-btn" data-panel="1" data-idx="2">Y</button>
+        <button class="toggle-btn" data-panel="1" data-idx="3">W</button>
+        <button class="toggle-btn" data-panel="1" data-idx="4">P</button>
+        <button class="toggle-btn" data-panel="1" data-idx="5">Msg</button>
         <button id="send-1" class="btn btn-primary send-btn">Enviar</button>
       </div>
     </div>
 
-    <!-- Programación 2 (Arduino) -->
+    <!-- Programación 3 (micro:bit 2) -->
     <div class="card mb-16">
-      <div class="card-title">Programación 2 (Arduino)</div>
+      <div class="card-title">Programación 3 (micro:bit 2)</div>
       <div class="toggle-row">
+        <span id="led-2" class="led-indicator"></span>
         <span id="hex-2" class="hex-display">-</span>
-        <button class="toggle-btn" data-panel="2" data-idx="0" data-byte="1">R</button>
-        <button class="toggle-btn" data-panel="2" data-idx="1" data-byte="2">B</button>
-        <button class="toggle-btn" data-panel="2" data-idx="2" data-byte="3">Y</button>
-        <button class="toggle-btn" data-panel="2" data-idx="3" data-byte="4">W</button>
-        <button class="toggle-btn" data-panel="2" data-idx="4" data-byte="5">P</button>
+        <button class="toggle-btn" data-panel="2" data-idx="0">♥</button>
+        <button class="toggle-btn" data-panel="2" data-idx="1">□</button>
+        <button class="toggle-btn" data-panel="2" data-idx="2">△</button>
+        <button class="toggle-btn" data-panel="2" data-idx="3">✓</button>
+        <button class="toggle-btn" data-panel="2" data-idx="4">✗</button>
+        <button class="toggle-btn" data-panel="2" data-idx="5">Msg</button>
         <button id="send-2" class="btn btn-primary send-btn">Enviar</button>
+      </div>
+    </div>
+
+    <!-- Programación 4 (Arduino 2) -->
+    <div class="card mb-16">
+      <div class="card-title">Programación 4 (Arduino 2)</div>
+      <div class="toggle-row">
+        <span id="led-3" class="led-indicator"></span>
+        <span id="hex-3" class="hex-display">-</span>
+        <button class="toggle-btn" data-panel="3" data-idx="0">R</button>
+        <button class="toggle-btn" data-panel="3" data-idx="1">B</button>
+        <button class="toggle-btn" data-panel="3" data-idx="2">Y</button>
+        <button class="toggle-btn" data-panel="3" data-idx="3">W</button>
+        <button class="toggle-btn" data-panel="3" data-idx="4">P</button>
+        <button class="toggle-btn" data-panel="3" data-idx="5">Msg</button>
+        <button id="send-3" class="btn btn-primary send-btn">Enviar</button>
       </div>
     </div>
 
@@ -283,8 +326,8 @@
   </div>
 
   <script>
-    // --- UUIDs ---
     const OPCODE_START = 0xF0;
+    const OPCODE_MENSAJE = 0x06;
     const UUID_ARDUINO = '0000ffe1-0000-1000-8000-00805f9b34fb';
     const UUID_MB_LEER = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
     const UUID_MB_ESCRIBIR = '6e400003-b5a3-f393-e0a9-e50e24dcca9e';
@@ -292,7 +335,9 @@
     const UUID_ARDUINO_SVC = '0000ffe0-0000-1000-8000-00805f9b34fb';
 
     // --- Estado ---
-    const connected = new Map(); // id -> { device, server, writeChar, readChar, type, name }
+    // connected: id -> { device, server, writeChar, type, name, programIndex }
+    // programIndex: 0=microbit1, 1=arduino1, 2=microbit2, 3=arduino2
+    const connected = new Map();
 
     // --- DOM ---
     const status = document.getElementById('status');
@@ -364,21 +409,35 @@
           return;
         }
 
+        const mismoTipo = [...connected.values()].filter((v) => v.type === type);
+        if (mismoTipo.length >= 2) {
+          log('❌ Ya hay 2 ' + (type === 'microbit' ? 'micro:bit' : 'Arduino') + ' conectados.');
+          server.disconnect();
+          return;
+        }
+
+        const slot = mismoTipo.length;
+        const programIndex = slot * 2 + (type === 'microbit' ? 0 : 1);
+
         const svc = await server.getPrimaryService(svcUuid);
         const writeChar = await svc.getCharacteristic(writeUuid);
-        let readChar = null;
         try {
-          readChar = await svc.getCharacteristic(readUuid);
+          const readChar = await svc.getCharacteristic(readUuid);
           await readChar.startNotifications();
           readChar.addEventListener('characteristicvaluechanged', (e) => {
-            const v = e.target.value;
-            const s = String.fromCharCode.apply(null, new Uint8Array(v.buffer)).replace(/\0/g, '').trim();
-            if (s) log('📥 [RECIBIDO] ' + s);
+            const arr = new Uint8Array(e.target.value.buffer || e.target.value);
+            if (arr && (arr.includes(0xAA) || arr[0] === 0xAA)) {
+              lightLed(programIndex);
+            }
+            try {
+              const s = String.fromCharCode.apply(null, arr).replace(/\0/g, '').trim();
+              if (s) log('📥 [RECIBIDO] ' + s);
+            } catch (_) {}
           });
         } catch (_) {}
 
-        connected.set(id, { device, server, writeChar, type, name: device.name || id });
-        log('🚀 ¡CONECTADO a ' + (device.name || id) + ' (Modo ' + (type === 'microbit' ? 'micro:bit' : 'Arduino') + ')!');
+        connected.set(id, { device, server, writeChar, type, name: device.name || id, programIndex });
+        log('🚀 ¡CONECTADO a ' + (device.name || id) + ' (' + (type === 'microbit' ? 'micro:bit' : 'Arduino') + ' ' + (slot + 1) + ')!');
         renderDeviceList();
 
         device.addEventListener('gattserverdisconnected', () => {
@@ -391,15 +450,24 @@
       }
     }
 
+    function lightLed(programIndex) {
+      const led = document.getElementById('led-' + programIndex);
+      if (!led) return;
+      led.classList.add('on');
+      setTimeout(() => led.classList.remove('on'), 1000);
+    }
+
     function renderDeviceList() {
       deviceList.innerHTML = '';
       connected.forEach((info, id) => {
+        const slot = Math.floor(info.programIndex / 2) + 1;
+        const label = (info.type === 'microbit' ? 'micro:bit' : 'Arduino') + ' ' + slot;
         const li = document.createElement('li');
         li.className = 'device-item';
         li.innerHTML = `
           <div>
             <span class="name">${info.name}</span>
-            <div class="type">${info.type === 'microbit' ? 'micro:bit' : 'Arduino'}</div>
+            <div class="type">${label}</div>
           </div>
           <button class="disconnect" data-id="${id}">Desconectar</button>
         `;
@@ -410,13 +478,6 @@
         };
         deviceList.appendChild(li);
       });
-    }
-
-    // --- Envíos ---
-    function getByType(type) {
-      return Array.from(connected.entries())
-        .filter(([, v]) => v.type === type)
-        .map(([id, v]) => [id, v]);
     }
 
     async function sendStart() {
@@ -437,43 +498,28 @@
       }
     }
 
-    async function sendToMicrobit(data) {
-      const targets = getByType('microbit');
-      if (!targets.length) {
-        log('⚠️ No hay micro:bit conectado.');
+    async function sendToProgram(programIndex, data, addNewline) {
+      const target = [...connected.values()].find((v) => v.programIndex === programIndex);
+      if (!target) {
+        log('⚠️ No hay placa en programación ' + (programIndex + 1) + '.');
         return;
       }
-      const payload = new Uint8Array([...data, 0x0a]);
-      for (const [, { writeChar, name }] of targets) {
-        try {
-          await writeChar.writeValueWithoutResponse(payload);
-          log('📤 [ENVIADO a ' + name + '] -> ' + Array.from(data).map(hex2).join(''));
-        } catch (e) {
-          log('❌ Falló envío a ' + name + ': ' + e.message);
-        }
+      const payload = addNewline ? new Uint8Array([...data, 0x0a]) : new Uint8Array(data);
+      try {
+        await target.writeChar.writeValueWithoutResponse(payload);
+        log('📤 [ENVIADO a ' + target.name + '] -> ' + Array.from(data).map(hex2).join(''));
+      } catch (e) {
+        log('❌ Falló envío: ' + e.message);
       }
     }
 
-    async function sendToArduino(data) {
-      const targets = getByType('arduino');
-      if (!targets.length) {
-        log('⚠️ No hay Arduino conectado.');
-        return;
-      }
-      const payload = new Uint8Array(data);
-      for (const [, { writeChar, name }] of targets) {
-        try {
-          await writeChar.writeValueWithoutResponse(payload);
-          log('📤 [ENVIADO a ' + name + '] -> ' + Array.from(data).map(hex2).join(''));
-        } catch (e) {
-          log('❌ Falló envío a ' + name + ': ' + e.message);
-        }
-      }
-    }
-
-    // --- Toggles ---
-    const panelState = { 1: [false, false, false, false, false], 2: [false, false, false, false, false] };
-    const panelBytes = { 1: [0x01, 0x02, 0x03, 0x04, 0x05], 2: [0x01, 0x02, 0x03, 0x04, 0x05] };
+    const panelConfig = [
+      { bytes: [0x01, 0x02, 0x03, 0x04, 0x05, OPCODE_MENSAJE], addNewline: true },
+      { bytes: [0x01, 0x02, 0x03, 0x04, 0x05, OPCODE_MENSAJE], addNewline: false },
+      { bytes: [0x01, 0x02, 0x03, 0x04, 0x05, OPCODE_MENSAJE], addNewline: true },
+      { bytes: [0x01, 0x02, 0x03, 0x04, 0x05, OPCODE_MENSAJE], addNewline: false },
+    ];
+    const panelState = { 0: [false, false, false, false, false, false], 1: [false, false, false, false, false, false], 2: [false, false, false, false, false, false], 3: [false, false, false, false, false, false] };
 
     document.querySelectorAll('.toggle-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -482,21 +528,19 @@
         panelState[panel][idx] = !panelState[panel][idx];
         btn.classList.toggle('on', panelState[panel][idx]);
         const hex = document.getElementById('hex-' + panel);
-        const bytes = panelState[panel].map((v, i) => v ? panelBytes[panel][i] : null).filter(Boolean);
+        const cfg = panelConfig[panel];
+        const bytes = panelState[panel].map((v, i) => v ? cfg.bytes[i] : null).filter(Boolean);
         hex.textContent = bytes.length ? bytes.map(b => hex2(b)).join('') : '-';
       });
     });
 
-    document.getElementById('send-1').addEventListener('click', () => {
-      const bytes = panelState[1].map((v, i) => v ? panelBytes[1][i] : null).filter(Boolean);
-      if (!bytes.length) { log('⚠️ No hay bytes seleccionados.'); return; }
-      sendToMicrobit(bytes);
-    });
-
-    document.getElementById('send-2').addEventListener('click', () => {
-      const bytes = panelState[2].map((v, i) => v ? panelBytes[2][i] : null).filter(Boolean);
-      if (!bytes.length) { log('⚠️ No hay bytes seleccionados.'); return; }
-      sendToArduino(bytes);
+    [0, 1, 2, 3].forEach((i) => {
+      document.getElementById('send-' + i).addEventListener('click', () => {
+        const cfg = panelConfig[i];
+        const bytes = panelState[i].map((v, j) => v ? cfg.bytes[j] : null).filter(Boolean);
+        if (!bytes.length) { log('⚠️ No hay bytes seleccionados.'); return; }
+        sendToProgram(i, bytes, cfg.addNewline);
+      });
     });
 
     // --- Eventos ---
